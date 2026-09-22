@@ -1,0 +1,89 @@
+name: Build ود فيصل APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: تحميل المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: إعداد Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: إعداد Android
+        uses: android-actions/setup-android@v3
+
+      - name: إنشاء مجلد التطبيق
+        run: |
+          mkdir -p www
+
+          cp index.html www/index.html
+          cp football.css www/football.css
+          cp football.js www/football.js
+
+      - name: إنشاء package.json
+        run: |
+          cat > package.json <<'EOF'
+          {
+            "name": "wad-faisal",
+            "version": "1.0.0",
+            "private": true,
+            "scripts": {
+              "build": "echo build complete"
+            },
+            "dependencies": {
+              "@capacitor/core": "^7.4.0",
+              "@capacitor/android": "^7.4.0"
+            },
+            "devDependencies": {
+              "@capacitor/cli": "^7.4.0"
+            }
+          }
+          EOF
+
+      - name: إنشاء إعداد Capacitor
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.wadfaisal.app",
+            "appName": "ود فيصل",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }
+          EOF
+
+      - name: تثبيت المكتبات
+        run: npm install
+
+      - name: إضافة Android
+        run: npx cap add android
+
+      - name: مزامنة التطبيق
+        run: npx cap sync android
+
+      - name: بناء APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: رفع APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: wad-faisal-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
