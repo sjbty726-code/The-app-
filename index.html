@@ -1,1 +1,771 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+<meta name="theme-color" content="#020817">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<title>ود فيصل</title>
+
+<link rel="stylesheet" href="football.css">
+</head>
+
+<body>
+
+<!-- ================= SPLASH ================= -->
+
+<div id="splash">
+
+    <div class="splash-ball">⚽</div>
+
+    <h1>ود فيصل</h1>
+
+    <p>كرة القدم... شغف لا ينتهي</p>
+
+    <div class="splash-loader">
+        <div></div>
+    </div>
+
+    <span id="splashCount">3</span>
+
+</div>
+
+
+<!-- ================= APP ================= -->
+
+<div id="app" class="hidden">
+
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-logo">و</div>
+
+        <div>
+            <strong>ود فيصل</strong>
+            <small>VIP SPORTS</small>
+        </div>
+    </div>
+
+    <button id="themeBtn" class="round-btn">☾</button>
+
+</header>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="homePage" class="page">
+
+    <div class="hero vip-card">
+
+        <div class="hero-orb"></div>
+
+        <div class="hero-content">
+
+            <span class="vip-badge">
+                ✦ WAD FAISAL VIP
+            </span>
+
+            <h1>
+                عالم كرة القدم
+                <br>
+                <span>بين يديك</span>
+            </h1>
+
+            <p>
+                المباريات، النتائج، المباشر،
+                الملخصات، التشكيلات والإحصائيات
+                في تجربة واحدة.
+            </p>
+
+            <button
+                class="main-btn"
+                onclick="openPage('footballPage')"
+            >
+                ⚽ دخول قسم كرة القدم
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- خدمات -->
+
+    <div class="section-title">
+
+        <span>الخدمات</span>
+
+        <h2>اختَر ما تريد</h2>
+
+    </div>
+
+
+    <div class="service-grid">
+
+        <button
+            class="service-card"
+            onclick="openPage('footballPage')"
+        >
+
+            <div class="service-icon">⚽</div>
+
+            <div>
+                <b>كرة القدم</b>
+                <small>المباريات والتفاصيل</small>
+            </div>
+
+            <span>←</span>
+
+        </button>
+
+
+        <button
+            class="service-card"
+            onclick="openPage('resultsPage')"
+        >
+
+            <div class="service-icon">🏆</div>
+
+            <div>
+                <b>النتائج</b>
+                <small>نتائج مباريات اليوم</small>
+            </div>
+
+            <span>←</span>
+
+        </button>
+
+
+        <button
+            class="service-card"
+            onclick="openPage('channelPage')"
+        >
+
+            <div class="service-icon">✈️</div>
+
+            <div>
+                <b>القناة</b>
+                <small>قناة ود فيصل</small>
+            </div>
+
+            <span>←</span>
+
+        </button>
+
+
+        <button
+            class="service-card"
+            onclick="openPage('developerPage')"
+        >
+
+            <div class="service-icon">👨‍💻</div>
+
+            <div>
+                <b>المطور</b>
+                <small>تواصل واقترح فكرة</small>
+            </div>
+
+            <span>←</span>
+
+        </button>
+
+    </div>
+
+
+    <!-- VIP -->
+
+    <div class="vip-banner">
+
+        <div>
+
+            <span>VIP EXPERIENCE</span>
+
+            <h2>تجربة رياضية مختلفة</h2>
+
+            <p>
+                واجهة سريعة، تنقل مريح،
+                وتفاصيل المباريات في مكان واحد.
+            </p>
+
+        </div>
+
+        <div class="vip-crown">♛</div>
+
+    </div>
+
+
+    <!-- مميزات -->
+
+    <div class="section-title">
+
+        <span>مميزات</span>
+
+        <h2>كل ما تحتاجه</h2>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="feature">
+            ⚡
+            <b>سريع</b>
+            <small>واجهة خفيفة</small>
+        </div>
+
+        <div class="feature">
+            🔴
+            <b>مباشر</b>
+            <small>حالة المباريات</small>
+        </div>
+
+        <div class="feature">
+            📋
+            <b>تشكيلات</b>
+            <small>عند توفرها</small>
+        </div>
+
+        <div class="feature">
+            📊
+            <b>إحصائيات</b>
+            <small>تفاصيل المباراة</small>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTBALL ================= -->
+
+<section id="footballPage" class="page hidden">
+
+    <div class="page-head">
+
+        <button onclick="openPage('homePage')" class="back-btn">
+            → الرئيسية
+        </button>
+
+        <div>
+
+            <span>VIP FOOTBALL CENTER</span>
+
+            <h1>⚽ كرة القدم</h1>
+
+            <p>مباريات اليوم والتفاصيل</p>
+
+        </div>
+
+        <button id="refreshBtn" class="small-btn">
+            ↻ تحديث
+        </button>
+
+    </div>
+
+
+    <div class="api-status">
+
+        <span id="apiDot"></span>
+
+        <span id="apiText">
+            جاري الاتصال...
+        </span>
+
+    </div>
+
+
+    <!-- البحث -->
+
+    <div class="search-panel">
+
+        <input
+            id="searchInput"
+            type="search"
+            placeholder="ابحث عن فريق أو بطولة..."
+        >
+
+    </div>
+
+
+    <!-- الفلاتر -->
+
+    <div class="filter-row">
+
+        <button
+            class="filter active"
+            data-filter="all"
+        >
+            الكل
+        </button>
+
+        <button
+            class="filter"
+            data-filter="live"
+        >
+            🔴 مباشر
+        </button>
+
+        <button
+            class="filter"
+            data-filter="upcoming"
+        >
+            القادمة
+        </button>
+
+        <button
+            class="filter"
+            data-filter="finished"
+        >
+            النتائج
+        </button>
+
+    </div>
+
+
+    <!-- الإحصائيات -->
+
+    <div class="stats-grid">
+
+        <div>
+            <b id="totalMatches">0</b>
+            <small>مباراة</small>
+        </div>
+
+        <div>
+            <b id="liveMatches">0</b>
+            <small>مباشر</small>
+        </div>
+
+        <div>
+            <b id="leagueCount">0</b>
+            <small>بطولة</small>
+        </div>
+
+    </div>
+
+
+    <div id="loadingBox" class="message-box">
+
+        <div class="spinner"></div>
+
+        <h3>جاري تحميل المباريات</h3>
+
+        <p>انتظر لحظات...</p>
+
+    </div>
+
+
+    <div id="errorBox" class="message-box hidden">
+
+        <div>⚠️</div>
+
+        <h3>تعذر تحميل المباريات</h3>
+
+        <p id="errorText"></p>
+
+        <button
+            class="main-btn"
+            onclick="loadMatches()"
+        >
+            إعادة المحاولة
+        </button>
+
+    </div>
+
+
+    <div
+        id="emptyBox"
+        class="message-box hidden"
+    >
+
+        <div>⚽</div>
+
+        <h3>لا توجد مباريات</h3>
+
+        <p>لا توجد مباريات مطابقة حالياً.</p>
+
+    </div>
+
+
+    <div id="matchesContainer"></div>
+
+
+    <div class="last-update">
+        آخر تحديث:
+        <b id="lastUpdate">--</b>
+    </div>
+
+</section>
+
+
+
+<!-- ================= RESULTS ================= -->
+
+<section id="resultsPage" class="page hidden">
+
+    <div class="page-head">
+
+        <button onclick="openPage('homePage')" class="back-btn">
+            → الرئيسية
+        </button>
+
+        <div>
+
+            <span>RESULTS CENTER</span>
+
+            <h1>🏆 النتائج</h1>
+
+            <p>المباريات المنتهية اليوم</p>
+
+        </div>
+
+    </div>
+
+    <div id="resultsContainer"></div>
+
+</section>
+
+
+
+<!-- ================= CHANNEL ================= -->
+
+<section id="channelPage" class="page hidden">
+
+    <div class="special-page">
+
+        <div class="special-icon">✈️</div>
+
+        <span>TELEGRAM CHANNEL</span>
+
+        <h1>قناة ود فيصل</h1>
+
+        <p>
+            تابع الأخبار والمنشورات والتحديثات
+            من القناة الرسمية.
+        </p>
+
+        <a
+            class="main-btn link-btn"
+            href="https://t.me/alrufaaey1"
+            target="_blank"
+            rel="noopener"
+        >
+            دخول القناة
+        </a>
+
+        <button
+            class="secondary-btn"
+            onclick="openPage('homePage')"
+        >
+            العودة
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= DEVELOPER ================= -->
+
+<section id="developerPage" class="page hidden">
+
+    <div class="developer-card">
+
+        <div class="developer-avatar">
+            👨‍💻
+        </div>
+
+        <span>DEVELOPER</span>
+
+        <h1>ود فيصل</h1>
+
+        <p>
+            لديك فكرة لتطوير التطبيق؟
+            أرسل اقتراحك مباشرة.
+        </p>
+
+        <a
+            class="main-btn link-btn"
+            href="https://t.me/mohmmedfysal"
+            target="_blank"
+            rel="noopener"
+        >
+            ✈️ مراسلة المطور
+        </a>
+
+    </div>
+
+
+    <div class="rating-card">
+
+        <h2>⭐ قيّم تجربة التطبيق</h2>
+
+        <p>اختر تقييمك</p>
+
+        <div class="stars">
+
+            <button data-rate="1">★</button>
+            <button data-rate="2">★</button>
+            <button data-rate="3">★</button>
+            <button data-rate="4">★</button>
+            <button data-rate="5">★</button>
+
+        </div>
+
+        <div id="ratingMessage">
+            لم يتم التقييم بعد
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= SETTINGS ================= -->
+
+<section id="settingsPage" class="page hidden">
+
+    <div class="page-head">
+
+        <button onclick="openPage('homePage')" class="back-btn">
+            → الرئيسية
+        </button>
+
+        <div>
+
+            <span>APP SETTINGS</span>
+
+            <h1>⚙️ الإعدادات</h1>
+
+            <p>خصص تجربة ود فيصل</p>
+
+        </div>
+
+    </div>
+
+
+    <div class="settings-card">
+
+        <div class="setting">
+
+            <div>
+                <b>🌙 الوضع الليلي</b>
+                <small>مظهر مريح للعين</small>
+            </div>
+
+            <label class="switch">
+                <input
+                    id="darkToggle"
+                    type="checkbox"
+                    checked
+                >
+                <span></span>
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div>
+                <b>🔄 التحديث التلقائي</b>
+                <small>تحديث المباريات تلقائياً</small>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    id="autoToggle"
+                    type="checkbox"
+                    checked
+                >
+
+                <span></span>
+
+            </label>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div>
+                <b>✨ المؤثرات</b>
+                <small>الحركات والمؤثرات البصرية</small>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    id="effectsToggle"
+                    type="checkbox"
+                    checked
+                >
+
+                <span></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- شرح -->
+
+    <div class="usage-card">
+
+        <h2>📖 شرح استخدام التطبيق</h2>
+
+        <div class="usage-item">
+            <b>1</b>
+            <span>
+                افتح قسم كرة القدم لمشاهدة مباريات اليوم.
+            </span>
+        </div>
+
+        <div class="usage-item">
+            <b>2</b>
+            <span>
+                اضغط على أي مباراة لفتح التفاصيل.
+            </span>
+        </div>
+
+        <div class="usage-item">
+            <b>3</b>
+            <span>
+                من تفاصيل المباراة يمكنك مشاهدة
+                الملخص والأحداث والتشكيلات والإحصائيات
+                عند توفرها.
+            </span>
+        </div>
+
+        <div class="usage-item">
+            <b>4</b>
+            <span>
+                استخدم البحث للوصول إلى فريق أو بطولة.
+            </span>
+        </div>
+
+        <div class="usage-item">
+            <b>5</b>
+            <span>
+                من الإعدادات تستطيع التحكم في
+                الوضع الليلي والتحديث التلقائي.
+            </span>
+        </div>
+
+    </div>
+
+
+    <div class="app-info">
+
+        <b>ود فيصل</b>
+
+        <span>VIP SPORTS</span>
+
+        <small>الإصدار 1.0.0</small>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= BOTTOM NAV ================= -->
+
+<nav class="bottom-nav">
+
+    <button
+        data-page="homePage"
+        class="nav-item active"
+    >
+        <span>⌂</span>
+        <small>الرئيسية</small>
+    </button>
+
+
+    <button
+        data-page="footballPage"
+        class="nav-item"
+    >
+        <span>⚽</span>
+        <small>المباريات</small>
+    </button>
+
+
+    <button
+        data-page="resultsPage"
+        class="nav-item"
+    >
+        <span>🏆</span>
+        <small>النتائج</small>
+    </button>
+
+
+    <button
+        data-page="channelPage"
+        class="nav-item"
+    >
+        <span>✈</span>
+        <small>القناة</small>
+    </button>
+
+
+    <button
+        data-page="settingsPage"
+        class="nav-item"
+    >
+        <span>⚙</span>
+        <small>الإعدادات</small>
+    </button>
+
+</nav>
+
+
+<!-- ================= MATCH DETAILS ================= -->
+
+<div
+    id="matchModal"
+    class="match-modal hidden"
+>
+
+    <div
+        class="modal-bg"
+        onclick="closeMatch()"
+    ></div>
+
+    <div class="match-details">
+
+        <button
+            class="close-modal"
+            onclick="closeMatch()"
+        >
+            ×
+        </button>
+
+
+        <div id="matchDetailsContent">
+
+            <div class="spinner"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script src="football.js"></script>
+
+</body>
+</html>
