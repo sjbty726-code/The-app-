@@ -11,24 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: تحميل المشروع
+
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: إعداد Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: إعداد Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: إعداد Android
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: إنشاء مجلد التطبيق
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
+
+      - name: Create web folder
         run: |
           mkdir -p www
 
@@ -36,16 +45,13 @@ jobs:
           cp football.css www/football.css
           cp football.js www/football.js
 
-      - name: إنشاء package.json
+      - name: Create package.json
         run: |
           cat > package.json <<'EOF'
           {
             "name": "wad-faisal",
             "version": "1.0.0",
             "private": true,
-            "scripts": {
-              "build": "echo build complete"
-            },
             "dependencies": {
               "@capacitor/core": "^7.4.0",
               "@capacitor/android": "^7.4.0"
@@ -56,33 +62,32 @@ jobs:
           }
           EOF
 
-      - name: إنشاء إعداد Capacitor
+      - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.wadfaisal.app",
             "appName": "ود فيصل",
-            "webDir": "www",
-            "bundledWebRuntime": false
+            "webDir": "www"
           }
           EOF
 
-      - name: تثبيت المكتبات
+      - name: Install Capacitor
         run: npm install
 
-      - name: إضافة Android
+      - name: Add Android
         run: npx cap add android
 
-      - name: مزامنة التطبيق
+      - name: Sync Android
         run: npx cap sync android
 
-      - name: بناء APK
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
-      - name: رفع APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: wad-faisal-apk
