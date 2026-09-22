@@ -2,65 +2,101 @@ name: Build ود فيصل APK
 
 on:
   workflow_dispatch:
+
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+
+env:
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build Android APK
+    runs-on: ubuntu-24.04
 
     steps:
 
-      # 1 - تحميل المشروع
+      # =========================================================
+      # 1. تحميل المشروع
+      # =========================================================
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      # 2 - إعداد Node.js
-      # مهم: لا نستخدم cache هنا لأن المشروع لا يحتوي
-      # package-lock.json
+      # =========================================================
+      # 2. إعداد Node.js
+      # لا يوجد cache حتى لا نحتاج package-lock.json
+      # =========================================================
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: "20"
           package-manager-cache: false
 
-      # 3 - إعداد Java
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      # =========================================================
+      # 3. إعداد Java 21
+      # Capacitor 7 يحتاج JDK 21+
+      # =========================================================
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: "21"
 
-      # 4 - إعداد Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      # 5 - تثبيت أدوات Android المطلوبة
-      - name: Install Android SDK
+      # =========================================================
+      # 4. التأكد من Android SDK الموجود مسبقًا
+      # لا نستخدم setup-android
+      # =========================================================
+      - name: Verify Android SDK
         shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-35"
-          sdkmanager "build-tools;35.0.0"
+          set -e
 
-      # 6 - التأكد من وجود ملفات التطبيق
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+
+          test -d "$ANDROID_HOME"
+
+          echo "Android SDK:"
+          ls -la "$ANDROID_HOME"
+
+          echo "Platforms:"
+          ls -la "$ANDROID_HOME/platforms" || true
+
+          echo "Build Tools:"
+          ls -la "$ANDROID_HOME/build-tools" || true
+
+          test -d "$ANDROID_HOME/platforms/android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0"
+
+          echo "Android SDK 35 found successfully."
+
+      # =========================================================
+      # 5. التحقق من ملفات التطبيق
+      # =========================================================
       - name: Check web files
         shell: bash
         run: |
-          echo "Checking project files..."
+          set -e
 
           test -f index.html
           test -f football.css
           test -f football.js
 
-          echo "All web files found."
+          echo "All required web files exist."
 
-      # 7 - إنشاء مجلد www
-      - name: Create www folder
+      # =========================================================
+      # 6. إنشاء مجلد www
+      # =========================================================
+      - name: Create www
         shell: bash
         run: |
+          set -e
+
           rm -rf www
           mkdir -p www
 
@@ -68,10 +104,17 @@ jobs:
           cp football.css www/football.css
           cp football.js www/football.js
 
-      # 8 - إنشاء package.json
+          echo "www created:"
+          ls -la www
+
+      # =========================================================
+      # 7. إنشاء package.json
+      # =========================================================
       - name: Create package.json
         shell: bash
         run: |
+          set -e
+
           cat > package.json <<'EOF'
           {
             "name": "wad-faisal",
@@ -79,30 +122,49 @@ jobs:
             "private": true,
             "description": "ود فيصل Football App",
             "scripts": {
-              "build": "echo Web app ready"
+              "build": "echo Web application ready"
             },
             "dependencies": {
-              "@capacitor/core": "^7.4.0",
-              "@capacitor/android": "^7.4.0"
+              "@capacitor/core": "7.4.3",
+              "@capacitor/android": "7.4.3"
             },
             "devDependencies": {
-              "@capacitor/cli": "^7.4.0"
+              "@capacitor/cli": "7.4.3"
             }
           }
           EOF
 
+          echo "package.json:"
           cat package.json
 
-      # 9 - تثبيت Capacitor
-      - name: Install Capacitor
+      # =========================================================
+      # 8. تثبيت Capacitor
+      # سيُنشئ package-lock.json تلقائيًا
+      # =========================================================
+      - name: Install npm dependencies
         shell: bash
         run: |
+          set -e
+
           npm install --no-audit --no-fund
 
-      # 10 - إنشاء إعداد Capacitor
+          echo "Node:"
+          node --version
+
+          echo "NPM:"
+          npm --version
+
+          echo "Installed packages:"
+          npm list --depth=0 || true
+
+      # =========================================================
+      # 9. إنشاء إعداد Capacitor
+      # =========================================================
       - name: Create Capacitor config
         shell: bash
         run: |
+          set -e
+
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.wadfaisal.app",
@@ -111,54 +173,134 @@ jobs:
           }
           EOF
 
+          echo "capacitor.config.json:"
           cat capacitor.config.json
 
-      # 11 - إنشاء مشروع Android
+      # =========================================================
+      # 10. إنشاء مشروع Android
+      # =========================================================
       - name: Add Android platform
         shell: bash
         run: |
+          set -e
+
           npx cap add android
 
-      # 12 - مزامنة ملفات التطبيق
+      # =========================================================
+      # 11. مزامنة Capacitor
+      # =========================================================
       - name: Sync Capacitor
         shell: bash
         run: |
+          set -e
+
           npx cap sync android
 
-      # 13 - فحص Android
-      - name: Check Android project
+      # =========================================================
+      # 12. فحص مشروع Android
+      # =========================================================
+      - name: Verify Android project
         shell: bash
         run: |
+          set -e
+
           test -d android
           test -f android/gradlew
+          test -f android/settings.gradle
+          test -f android/build.gradle
+          test -f android/app/build.gradle
 
-          echo "Android project created successfully."
+          chmod +x android/gradlew
 
-      # 14 - بناء APK
+          echo "Android project is ready."
+
+      # =========================================================
+      # 13. معلومات البيئة
+      # =========================================================
+      - name: Show build environment
+        shell: bash
+        run: |
+          echo "Java:"
+          java -version
+
+          echo ""
+          echo "Gradle:"
+          cd android
+          ./gradlew --version
+
+          echo ""
+          echo "Android SDK:"
+          echo "$ANDROID_HOME"
+
+      # =========================================================
+      # 14. تنظيف مشروع Android
+      # =========================================================
+      - name: Clean Android project
+        shell: bash
+        run: |
+          set -e
+
+          cd android
+
+          ./gradlew clean \
+            --no-daemon \
+            --stacktrace
+
+      # =========================================================
+      # 15. بناء APK
+      # =========================================================
       - name: Build Debug APK
         shell: bash
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          set -e
 
-      # 15 - التأكد من وجود APK
-      - name: Check APK
+          cd android
+
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --stacktrace \
+            --warning-mode all
+
+      # =========================================================
+      # 16. التأكد من إنشاء APK
+      # =========================================================
+      - name: Verify APK
         shell: bash
         run: |
-          test -f android/app/build/outputs/apk/debug/app-debug.apk
+          set -e
 
-          echo "======================================"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+
+          test -f "$APK"
+
+          echo "========================================"
           echo "APK BUILD SUCCESSFUL"
-          echo "======================================"
+          echo "========================================"
 
-          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+          ls -lh "$APK"
 
-      # 16 - رفع APK إلى GitHub
+      # =========================================================
+      # 17. رفع APK إلى GitHub
+      # =========================================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: wad-faisal-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          retention-days: 7
+
+      # =========================================================
+      # 18. رفع سجل Android عند الفشل
+      # =========================================================
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-logs
+          path: |
+            android/**/*.log
+            android/**/build/reports/**
+            android/**/build/outputs/logs/**
+          if-no-files-found: ignore
           retention-days: 7
