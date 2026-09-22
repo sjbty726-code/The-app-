@@ -12,46 +12,75 @@ jobs:
 
     steps:
 
+      # 1 - تحميل المشروع
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2 - إعداد Node.js
+      # مهم: لا نستخدم cache هنا لأن المشروع لا يحتوي
+      # package-lock.json
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          package-manager-cache: false
 
+      # 3 - إعداد Java
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # 4 - إعداد Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK packages
+      # 5 - تثبيت أدوات Android المطلوبة
+      - name: Install Android SDK
+        shell: bash
         run: |
-          yes | sdkmanager --licenses || true
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-35"
           sdkmanager "build-tools;35.0.0"
 
-      - name: Create web folder
+      # 6 - التأكد من وجود ملفات التطبيق
+      - name: Check web files
+        shell: bash
         run: |
+          echo "Checking project files..."
+
+          test -f index.html
+          test -f football.css
+          test -f football.js
+
+          echo "All web files found."
+
+      # 7 - إنشاء مجلد www
+      - name: Create www folder
+        shell: bash
+        run: |
+          rm -rf www
           mkdir -p www
 
           cp index.html www/index.html
           cp football.css www/football.css
           cp football.js www/football.js
 
+      # 8 - إنشاء package.json
       - name: Create package.json
+        shell: bash
         run: |
           cat > package.json <<'EOF'
           {
             "name": "wad-faisal",
             "version": "1.0.0",
             "private": true,
+            "description": "ود فيصل Football App",
+            "scripts": {
+              "build": "echo Web app ready"
+            },
             "dependencies": {
               "@capacitor/core": "^7.4.0",
               "@capacitor/android": "^7.4.0"
@@ -62,7 +91,17 @@ jobs:
           }
           EOF
 
+          cat package.json
+
+      # 9 - تثبيت Capacitor
+      - name: Install Capacitor
+        shell: bash
+        run: |
+          npm install --no-audit --no-fund
+
+      # 10 - إنشاء إعداد Capacitor
       - name: Create Capacitor config
+        shell: bash
         run: |
           cat > capacitor.config.json <<'EOF'
           {
@@ -72,23 +111,54 @@ jobs:
           }
           EOF
 
-      - name: Install Capacitor
-        run: npm install
+          cat capacitor.config.json
 
-      - name: Add Android
-        run: npx cap add android
+      # 11 - إنشاء مشروع Android
+      - name: Add Android platform
+        shell: bash
+        run: |
+          npx cap add android
 
-      - name: Sync Android
-        run: npx cap sync android
+      # 12 - مزامنة ملفات التطبيق
+      - name: Sync Capacitor
+        shell: bash
+        run: |
+          npx cap sync android
 
-      - name: Build APK
+      # 13 - فحص Android
+      - name: Check Android project
+        shell: bash
+        run: |
+          test -d android
+          test -f android/gradlew
+
+          echo "Android project created successfully."
+
+      # 14 - بناء APK
+      - name: Build Debug APK
+        shell: bash
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
+      # 15 - التأكد من وجود APK
+      - name: Check APK
+        shell: bash
+        run: |
+          test -f android/app/build/outputs/apk/debug/app-debug.apk
+
+          echo "======================================"
+          echo "APK BUILD SUCCESSFUL"
+          echo "======================================"
+
+          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+
+      # 16 - رفع APK إلى GitHub
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: wad-faisal-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
